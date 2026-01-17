@@ -1,0 +1,217 @@
+<!--Tic Tac Toe Web application-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    height: 100vh;
+    background:
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+        url("tictactoe.png");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.game {
+    width: 380px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(30px);
+    border-radius: 28px;
+    padding: 35px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+    text-align: center;
+}
+
+.game h1 {
+    margin-bottom: 18px;
+    letter-spacing: 2px;
+}
+
+.scoreboard {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    background: rgba(255,255,255,0.12);
+    padding: 12px 18px;
+    border-radius: 16px;
+}
+
+.scoreboard div {
+    font-size: 14px;
+}
+
+.status {
+    margin-bottom: 25px;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.cell {
+    height: 95px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.12);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 42px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cell:hover {
+    background: rgba(255,255,255,0.22);
+    transform: scale(1.05);
+}
+
+.cell.x {
+    color: #38bdf8;
+    text-shadow: 0 0 12px #38bdf8;
+}
+
+.cell.o {
+    color: #22c55e;
+    text-shadow: 0 0 12px #22c55e;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    color: #020617;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+    <h1>TIC TAC TOE</h1>
+
+    <div class="scoreboard">
+        <div>❌ X Wins: <span id="xScore">0</span></div>
+        <div>⭕ O Wins: <span id="oScore">0</span></div>
+        <div>🤝 Draws: <span id="drawScore">0</span></div>
+    </div>
+
+    <div class="status" id="status">Player X's Turn</div>
+
+    <div class="board" id="board">
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    </div>
+
+    <button id="restart">Restart Game</button>
+</div>
+
+<script>
+let board = Array(9).fill("")
+let currentPlayer = "X"
+let active = true
+
+let xWins = 0
+let oWins = 0
+let draws = 0
+
+const statusText = document.getElementById("status")
+const cells = document.querySelectorAll(".cell")
+
+const wins = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+]
+
+cells.forEach((cell, i) => {
+    cell.onclick = () => {
+        if (board[i] || !active) return
+
+        board[i] = currentPlayer
+        cell.textContent = currentPlayer
+        cell.classList.add(currentPlayer.toLowerCase())
+
+        checkResult()
+    }
+})
+
+function checkResult() {
+    for (let combo of wins) {
+        const [a,b,c] = combo
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            statusText.textContent = `Player ${currentPlayer} Wins!`
+            active = false
+
+            if (currentPlayer === "X") xWins++
+            else oWins++
+
+            updateScore()
+            return
+        }
+    }
+
+    if (!board.includes("")) {
+        statusText.textContent = "It's a Draw!"
+        draws++
+        active = false
+        updateScore()
+        return
+    }
+
+    currentPlayer = currentPlayer === "X" ? "O" : "X"
+    statusText.textContent = `Player ${currentPlayer}'s Turn`
+}
+
+function updateScore() {
+    document.getElementById("xScore").textContent = xWins
+    document.getElementById("oScore").textContent = oWins
+    document.getElementById("drawScore").textContent = draws
+}
+
+document.getElementById("restart").onclick = () => {
+    board = Array(9).fill("")
+    active = true
+    currentPlayer = "X"
+    statusText.textContent = "Player X's Turn"
+    cells.forEach(cell => {
+        cell.textContent = ""
+        cell.className = "cell"
+    })
+}
+</script>
+
+</body>
+</html>
